@@ -11,7 +11,7 @@ from langchain.prompts import PromptTemplate
 
 # Load environment variables
 load_dotenv()
-groq_api_key = os.getenv(xai-bGa7yRBsksSnfVWTf9UtIeeDStSs1WVlK9JhRKWhh6KO7U9dZ74nKE5r2lZN8z9HldWcmw0kaAtdany8)
+groq_api_key = os.getenv(groq_api_key)
 
 # Initialize session state for chat history and vector store
 if "chat_history" not in st.session_state:
