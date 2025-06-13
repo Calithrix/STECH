@@ -79,6 +79,12 @@ if uploaded_file is not None:
     
     st.success("PDF processed successfully! You can now ask questions.")
 
+# validation check for API keys 
+print(f"API Key: {groq_api_key}")
+if not groq_api_key:
+    st.error("GROQ_API_KEY is not set. Please check .env or Streamlit secrets.")
+    st.stop()
+    
 # Chat interface
 st.subheader("Ask a Question")
 user_question = st.text_input("Enter your question about the PDF:", key="question")
