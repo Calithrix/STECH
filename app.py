@@ -9,7 +9,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
-
+from sentence_transformers import SentenceTransformer
 
 # Load environment variables
 load_dotenv()
@@ -45,24 +45,34 @@ if uploaded_file is not None:
     docs = text_splitter.split_documents(documents)
     
     # Initialize embeddings with explicit device setting
-    embeddings = HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"}  # Force CPU to avoid meta tensor issue
-    )
-    print(f"Embeddings initialized on device: {embeddings.client.device}")  # Debug
+from langchain_community.embeddings import HuggingFaceEmbeddings
+import torch
+from sentence_transformers import SentenceTransformer
+embeddings = HuggingFaceEmbeddings(
+    model_name="all-MiniLM-L6-v2",
+    model_kwargs={"device": "cpu"}
+)
+# Manually initialize SentenceTransformer to avoid meta tensor issue
+embeddings.client = SentenceTransformer(
+    model_name="all-MiniLM-L6-v2",
+    device="cpu"
+)
+print(f"Embeddings device: {embeddings.client.device}")  # Debug
+    # Force CPU to avoid meta tensor issue
+print(f"Embeddings initialized on device: {embeddings.client.device}")  # Debug
     
     # Create vector store
-    st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
+st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
     
     # Initialize Grok LLM
-    llm = ChatGroq(
+llm = ChatGroq(
         model_name="llama-3.1-70b-versatile",
-        api_key = "XAI_API_KEY",
+        api_key = "xai_api_key",
         temperature=0.7
     )
     
     # Define prompt template
-    prompt_template = PromptTemplate(
+prompt_template = PromptTemplate(
         input_variables=["question", "context", "chat_history"],
         template="""
         You are a helpful assistant that answers questions based on the provided PDF content.
@@ -78,14 +88,14 @@ if uploaded_file is not None:
     )
     
     # Create conversational retrieval chain
-    st.session_state.conversation = ConversationalRetrievalChain.from_llm(
+st.session_state.conversation = ConversationalRetrievalChain.from_llm(
         llm=llm,
         retriever=st.session_state.vectorstore.as_retriever(search_kwargs={"k": 3}),
         combine_docs_chain_kwargs={"prompt": prompt_template},
         return_source_documents=True
     )
     
-    st.success("PDF processed successfully! You can now ask questions.")
+st.success("PDF processed successfully! You can now ask questions.")
 
 # validation check for API keys 
 print(f"API Key: {XAI_API_KEY}")
