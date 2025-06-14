@@ -11,7 +11,7 @@ from langchain.prompts import PromptTemplate
 
 # Load environment variables
 load_dotenv()
-groq_api_key = os.getenv("GROQ_API_KEY")
+GROQ_API_KEY= os.getenv("GROQ_API_KEY")
 
 # Initialize session state for chat history and vector store
 if "chat_history" not in st.session_state:
@@ -49,7 +49,7 @@ if uploaded_file is not None:
     # Initialize Grok LLM
     llm = ChatGroq(
         model_name="llama-3.1-70b-versatile",
-        api_key=groq_api_key,
+        api_key = "GROQ_API_KEY",
         temperature=0.7
     )
     
@@ -80,8 +80,8 @@ if uploaded_file is not None:
     st.success("PDF processed successfully! You can now ask questions.")
 
 # validation check for API keys 
-print(f"API Key: {groq_api_key}")
-if not groq_api_key:
+print(f"API Key: {GROQ_API_KEY}")
+if not GROQ_API_KEY:
     st.error("GROQ_API_KEY is not set. Please check .env or Streamlit secrets.")
     st.stop()
     
