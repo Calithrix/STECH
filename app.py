@@ -13,7 +13,7 @@ from sentence_transformers import SentenceTransformer
 
 
 # Load environment variables
-load_dotenv()
+load_dotenv(r"C:/Users/Matthew/Dropbox/The App/pdf_parser/.env")
 XAI_API_KEY= os.getenv("XAI_API_KEY")
 print(f"Using API Key: {xai_api_key}")
 if not xai_api_key:
