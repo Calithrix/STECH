@@ -11,9 +11,14 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 from sentence_transformers import SentenceTransformer
 
+
 # Load environment variables
 load_dotenv()
 XAI_API_KEY= os.getenv("XAI_API_KEY")
+print(f"Using API Key: {xai_api_key}")
+if not xai_api_key:
+    st.error("XAI_API_KEY not set. Please check .env or Streamlit secrets.")
+    st.stop()
 
 # Initialize session state for chat history and vector store
 if "chat_history" not in st.session_state:
@@ -45,16 +50,14 @@ if uploaded_file is not None:
     docs = text_splitter.split_documents(documents)
     
     # Initialize embeddings with explicit device setting
-from langchain_community.embeddings import HuggingFaceEmbeddings
-import torch
-from sentence_transformers import SentenceTransformer
 embeddings = HuggingFaceEmbeddings(
     model_name="all-MiniLM-L6-v2",
     model_kwargs={"device": "cpu"}
 )
+
 # Manually initialize SentenceTransformer to avoid meta tensor issue
 embeddings.client = SentenceTransformer(
-    model_name="all-MiniLM-L6-v2",
+    "all-MiniLM-L6-v2",
     device="cpu"
 )
 print(f"Embeddings device: {embeddings.client.device}")  # Debug
@@ -67,7 +70,7 @@ st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
     # Initialize Grok LLM
 llm = ChatGroq(
         model_name="llama-3.1-70b-versatile",
-        api_key = "xai_api_key",
+        api_key=xai_api_key,
         temperature=0.7
     )
     
