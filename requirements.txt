@@ -2,6 +2,10 @@ streamlit
 langchain
 langchain-groq
 langchain-community
+pypdf
 pypdf2
 faiss-cpu
 python-dotenv
+torch==2.3.0
+sentence-transformers==2.7.0
+langchain-community==0.3.24
