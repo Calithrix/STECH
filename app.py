@@ -1,5 +1,6 @@
 import os
 import streamlit as st
+import torch
 from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_community.vectorstores import FAISS
@@ -9,9 +10,10 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.chains import ConversationalRetrievalChain
 from langchain.prompts import PromptTemplate
 
+
 # Load environment variables
 load_dotenv()
-GROQ_API_KEY= os.getenv("GROQ_API_KEY")
+XAI_API_KEY= os.getenv("XAI_API_KEY")
 
 # Initialize session state for chat history and vector store
 if "chat_history" not in st.session_state:
@@ -42,14 +44,20 @@ if uploaded_file is not None:
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     docs = text_splitter.split_documents(documents)
     
-    # Create embeddings and vector store
-    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    # Initialize embeddings with explicit device setting
+    embeddings = HuggingFaceEmbeddings(
+        model_name="all-MiniLM-L6-v2",
+        model_kwargs={"device": "cpu"}  # Force CPU to avoid meta tensor issue
+    )
+    print(f"Embeddings initialized on device: {embeddings.client.device}")  # Debug
+    
+    # Create vector store
     st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
     
     # Initialize Grok LLM
     llm = ChatGroq(
         model_name="llama-3.1-70b-versatile",
-        api_key = "GROQ_API_KEY",
+        api_key = "XAI_API_KEY",
         temperature=0.7
     )
     
@@ -80,9 +88,9 @@ if uploaded_file is not None:
     st.success("PDF processed successfully! You can now ask questions.")
 
 # validation check for API keys 
-print(f"API Key: {GROQ_API_KEY}")
-if not GROQ_API_KEY:
-    st.error("GROQ_API_KEY is not set. Please check .env or Streamlit secrets.")
+print(f"API Key: {XAI_API_KEY}")
+if not XAI_API_KEY:
+    st.error("XAI_API_KEY is not set. Please check .env or Streamlit secrets.")
     st.stop()
     
 # Chat interface
