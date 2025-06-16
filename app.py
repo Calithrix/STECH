@@ -23,8 +23,8 @@ if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "vectorstore" not in st.session_state:
     st.session_state.vectorstore = None
-if "conversation" not in st.session_state:
-    st.session_state.conversation = None
+if "qa_chain" not in st.session_state:
+    st.session_state.qa_chain = None
 
 # Streamlit app layout
 st.set_page_config(page_title="STECH PDF Parser", page_icon="📄")
@@ -40,14 +40,17 @@ if uploaded_file is not None:
     # save the uploaded file temporarily
     with open("temp.pdf", "wb") as f:
         f.write(uploaded_file.getbuffer())
+    
     # load and process PDF
     loader = PyPDFLoader("temp.pdf", extract_images=False)
     documents = loader.load()
     print(f"Loaded {len(documents)} documents") # DEBUG
+
     # split documents into chunks
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     docs = text_splitter.split_documents(documents)
     print(f"Split into {len(docs)} chunks")  # DEBUG    
+
     # initialize embeddings with explicit device setting
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
 
@@ -82,11 +85,11 @@ if uploaded_file is not None:
     )
     # Create conversational retrieval chain
     st.session_state.qa_chain = RetrievalQA.from_chain_type(
-    llm=llm,
-    chain_type="stuff",
-    retriever=st.session_state.vectorstore.as_retriever(search_kwargs={"k": 5}),
-    return_source_documents=True,
-    chain_type_kwargs={"prompt": prompt_template}
+        llm=llm,
+        chain_type="stuff",
+        retriever=st.session_state.vectorstore.as_retriever(search_kwargs={"k": 5}),
+        return_source_documents=True,
+        chain_type_kwargs={"prompt": prompt_template}
     )   
     print("QA chain created")  # Debug
     st.success("PDF processed successfully! You can now ask questions.")
