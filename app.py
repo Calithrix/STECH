@@ -29,7 +29,7 @@ st.title("📄 STECH PDF Parser")
 st.write("Upload a PDF and ask questions about its content or pull direct quotes!")
 
 # upload file 
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf" key="pdf_uploader")
+uploaded_file = st.file_uploader("Choose a PDF file", type="pdf", key="pdf_uploader")
 
 if uploaded_file is not None:
     # save the uploaded file temporarily
