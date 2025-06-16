@@ -31,24 +31,21 @@ st.write("Upload a PDF and ask questions about its content or pull direct quotes
 # upload file 
 uploaded_file = st.file_uploader("Choose a PDF file", type="pdf", key="pdf_uploader")
 
+
+
 if uploaded_file is not None:
     # save the uploaded file temporarily
     with open("temp.pdf", "wb") as f:
         f.write(uploaded_file.getbuffer())
-    
     # load and process PDF
-    loader = PyPDFLoader("temp.pdf")
+    loader = PyPDFLoader("temp.pdf", extract_images=False)
     documents = loader.load()
-    
     # split documents into chunks
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     docs = text_splitter.split_documents(documents)
-    
     # initialize embeddings with explicit device setting
-embeddings = HuggingFaceEmbeddings(
-    model_name="all-MiniLM-L6-v2",
-    model_kwargs={"device": "cpu"}
-)
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+    st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
 
     # Create vector store
 st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
