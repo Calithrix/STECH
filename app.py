@@ -10,12 +10,12 @@ from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
 
 
-# Load environment variables
+# load environment variables
 load_dotenv(r"C:/Users/Matthew/Dropbox/The App/pdf_parser/.env")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 
-# Initialize session state for chat history and vector store
+# initialize session state for chat history and vector store
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 if "vectorstore" not in st.session_state:
@@ -27,10 +27,9 @@ if "conversation" not in st.session_state:
 st.set_page_config(page_title="STECH PDF Parser", page_icon="📄")
 st.title("📄 STECH PDF Parser")
 st.write("Upload a PDF and ask questions about its content or pull direct quotes!")
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
 
-# File uploader
-uploaded_file = st.file_uploader("Choose a PDF file", type="pdf")
+# upload file 
+uploaded_file = st.file_uploader("Choose a PDF file", type="pdf" key="pdf_uploader")
 
 if uploaded_file is not None:
     # save the uploaded file temporarily
