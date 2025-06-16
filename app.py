@@ -71,7 +71,7 @@ if uploaded_file is not None:
     
     # Define prompt template
     prompt_template = PromptTemplate(
-        input_variables=["question", "context", "chat_history"],
+        input_variables=["context", "input"],
         template="""
         You are a helpful assistant that answers questions based on the provided PDF content.
         Provide exact quotes when possible, including page numbers from the source.
@@ -116,13 +116,14 @@ if submit_button and user_question and st.session_state.qa_chain:
     print("Processing query")  # Debug
     try:
         # Get response from the conversation chain
-        result = st.session_state.qa_chain.invoke({"query": user_question})
+        result = st.session_state.qa_chain.invoke({"input": user_question})
         answer = result["result"]
         sources = result["source_documents"]
         
         # Update chat history
         st.session_state.chat_history.append((user_question, answer))
-        
+        print(f"Chain input schema: {st.session_state.qa_chain.input_keys}")  # Debug
+
         # Display the answer
         st.write("**Answer**: ", answer)
         st.write("**Sources**:")
