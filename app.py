@@ -48,7 +48,7 @@ if uploaded_file is not None:
     st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
 
     # Create vector store
-st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
+    st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
     
     # Initialize chatgpt 
 llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
