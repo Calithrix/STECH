@@ -97,7 +97,7 @@ else:
     st.info("Please upload a PDF to start asking questions.")
 
 # validation check for API keys 
-print(f"API Key: {OPENAI_API_KEY}[:5]")
+print(f"API Key: {OPENAI_API_KEY[:5]}")
 if not OPENAI_API_KEY:
     st.error("OPENAI_API_KEY is not set. Please check .env or Streamlit secrets.")
     st.stop()
@@ -116,7 +116,7 @@ if submit_button and user_question and st.session_state.qa_chain:
     print("Processing query")  # Debug
     try:
         # Get response from the conversation chain
-        result = st.session_state.qa_chain({"query": user_question})
+        result = st.session_state.qa_chain.invoke({"query": user_question})
         answer = result["result"]
         sources = result["source_documents"]
         
