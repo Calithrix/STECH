@@ -50,20 +50,36 @@ if uploaded_file is not None:
     st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
     
     # Initialize chatgpt 
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0)
+try:
+        llm = ChatOpenAI(
+            model_name="gpt-4o-mini",
+            api_key=OPENAI_API_KEY,
+            temperature=0.7
+        )
+except Exception as e:
+        st.error(f"Failed to initialize LLM: {e}")
+        st.stop()
     
     # Define prompt template
 prompt_template = PromptTemplate(
     input_variables=["question", "context", "chat_history"],
-    template="""..."""
+    template="""You are a helpful assistant that answers questions based on the provided PDF content.
+        Provide exact quotes when possible, including page numbers from the source.
+        If the answer is not in the context, say so.
+        Context: {context}
+        Question: {query}
+
+        Answer:
+        """
 )
     # Create conversational retrieval chain
-qa_chain = RetrievalQA.from_chain_type(
-        llm=llm,
-        chain_type="stuff",
-        retriever=vector_store.as_retriever(),
-        return_source_documents=True
-    )
+st.session_state.qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type="stuff",
+    retriever=st.session_state.vectorstore.as_retriever(search_kwargs={"k": 5}),
+    return_source_documents=True,
+    chain_type_kwargs={"prompt": prompt_template}
+)
     
 st.success("PDF processed successfully! You can now ask questions.")
 
