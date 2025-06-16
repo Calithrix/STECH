@@ -45,7 +45,6 @@ if uploaded_file is not None:
     docs = text_splitter.split_documents(documents)
     # initialize embeddings with explicit device setting
     embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-    st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
 
     # Create vector store
     st.session_state.vectorstore = FAISS.from_documents(docs, embeddings)
